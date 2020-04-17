@@ -64,6 +64,12 @@ class RacecarSimulator {
     ros::Publisher scan_pub;
     ros::Publisher odom_pub;
 
+    // Noise to add to odom sensor
+    std::mt19937 noise_generator;    
+    std::normal_distribution<double> twist_x_lin_dist, twist_x_ang_dist,
+      twist_y_ang_dist, twist_z_ang_dist;
+    std::vector<double> mu_twist;
+
   public:
 
     RacecarSimulator() {
@@ -120,6 +126,14 @@ class RacecarSimulator {
           scan_beams,
           scan_field_of_view,
           scan_std_dev);
+
+      // Noise to add to Odometry twist
+      n.getParam("mu_twist", mu_twist);
+      noise_generator = std::mt19937(std::random_device{}());
+      twist_x_lin_dist = std::normal_distribution<double>(0., mu_twist[0]);
+      twist_x_ang_dist = std::normal_distribution<double>(0., mu_twist[3]);
+      twist_y_ang_dist = std::normal_distribution<double>(0., mu_twist[4]);
+      twist_z_ang_dist = std::normal_distribution<double>(0., mu_twist[5]);
 
       // Make a publisher for laser scan messages
       scan_pub = n.advertise<sensor_msgs::LaserScan>(scan_topic, 1);
@@ -191,6 +205,14 @@ class RacecarSimulator {
       odom.twist.twist.linear.x = speed;
       odom.twist.twist.angular.z = 
         AckermannKinematics::angular_velocity(speed, steering_angle, wheelbase);
+        
+      // Add noise to odom
+      if (mu_twist[0] > 0) {
+          odom.twist.twist.linear.x += twist_x_lin_dist(noise_generator);
+          odom.twist.twist.angular.x += twist_x_ang_dist(noise_generator);
+          odom.twist.twist.angular.x += twist_x_ang_dist(noise_generator);
+          odom.twist.twist.angular.x += twist_x_ang_dist(noise_generator);
+      }
 
       // Publish them
       if (broadcast_transform) br.sendTransform(ts);

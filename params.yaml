@@ -49,3 +49,6 @@ scan_frame: "laser"
 
 # Turn this off for mapping
 broadcast_transform: true
+
+# Noise to add to odometry twist (first 3 are linear, last 3 are angular)
+mu_twist: [0., 0., 0., 0. 0., 0.]
