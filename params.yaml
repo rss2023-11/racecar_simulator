@@ -37,7 +37,7 @@ joy_topic: "/joy"
 drive_topic: "/drive"
 map_topic: "/map"
 distance_transform_topic: "/dt"
-scan_topic: "/scan"
+scan_topic: "/scan_2"
 pose_topic: "/pose"
 odom_topic: "/odom"
 pose_rviz_topic: "/initialpose"
@@ -48,7 +48,7 @@ base_frame: "base_link"
 scan_frame: "laser"
 
 # Turn this off for mapping
-broadcast_transform: true
+broadcast_transform: false
 
 # Noise to add to odometry twist (first 3 are linear, last 3 are angular)
 mu_twist: [0., 0., 0., 0. 0., 0.]
